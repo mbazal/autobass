@@ -1,0 +1,27 @@
+# AutoBass Exclusion File (.bassignore)
+# List patterns of files and directories to exclude from backups
+# One pattern per line - supports wildcards like .gitignore
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Log files
+*.log
+
+# Cache directories
+cache/
+.cache/
+
+# Temporary directories
+tmp/
+temp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
