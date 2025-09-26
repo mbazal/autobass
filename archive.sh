@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # help section
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Usage: options"
@@ -25,3 +27,25 @@ if [ ! -d "$DST" ]; then
   echo "Use -h or --help for usage."
   exit 1
 fi
+
+# create timestamped backup folder
+echo "Creating backup archive..."
+TS=$(date +"%Y%m%d_%H%M%S")
+TARGET="$DST/backup_${TS}"
+echo "Backup folder: $TARGET"
+
+mkdir -p "$TARGET" || { 
+    echo "Error: Failed to create backup directory '$TARGET'" >&2
+    exit 1 
+}
+
+# copy all files including all the hidden files to the backup folder
+echo "Copying files from '$SRC' to backup folder..."
+# Using '/.' to ensure hidden files are included in the copy 
+cp -a "$SRC"/. "$TARGET"/ || { 
+    echo "Error: File copy operation failed" >&2
+    exit 1 
+}
+# completion message
+echo "✓ Backup completed successfully!"
+echo "Your files have been archived to: $TARGET"
