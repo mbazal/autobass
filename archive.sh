@@ -13,30 +13,55 @@ log_message() {
 
 # help section
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    echo "Usage: $0 [OPTIONS] SOURCE_DIR TARGET_DIR"
+    echo "Usage: $0 [OPTIONS] [SOURCE_DIR] [TARGET_DIR]"
     echo ""
-    echo "Creates a compressed .tar.gz archive of SOURCE_DIR in TARGET_DIR"
-    echo "with timestamp (e.g., backup_20250926_123456.tar.gz)"
+    echo "Creates a compressed .tar.gz archive with automatic timestamping"
+    echo ""
+    echo "MODES:"
+    echo "  With arguments:    $0 SOURCE_DIR TARGET_DIR"
+    echo "  With config file:  $0 (uses archive.conf)"
+    echo ""
     echo "OPTIONS:"
     echo "  -h, --help    Show this help message"
-    echo " Examples:   "
+    echo ""
+    echo "EXAMPLES:"
     echo "  $0 /home/user/documents /backups"
     echo "  $0 ./src ./archives"
+    echo "  $0  (uses paths from archive.conf)"
+    echo ""
+    echo "CONFIG FILE:"
+    echo "  Edit 'archive.conf' to set default SOURCE_DIR and TARGET_DIR"
     exit 0
 fi
 
 # Log start of execution
 log_message "INFO" "archive script started"
 
-# check number of arguments 
-if [ $# -ne 2 ]; then
+# Configuration file handling
+CONFIG_FILE="archive.conf"
+
+# Check if we should use config file or command line arguments
+if [ $# -eq 0 ]; then
+    # No arguments provided - try to use config file
+    if [ -f "$CONFIG_FILE" ]; then
+        log_message "INFO" "No arguments provided, loading configuration from $CONFIG_FILE"
+        source "$CONFIG_FILE"
+        SRC="$SOURCE_DIR"
+        DST="$TARGET_DIR"
+    else
+        log_message "ERROR" "No arguments provided and no config file ($CONFIG_FILE) found. Use -h for help."
+        exit 1
+    fi
+elif [ $# -eq 2 ]; then
+    # Two arguments provided - use command line arguments
+    log_message "INFO" "Using command line arguments"
+    SRC="$1"
+    DST="$2"
+else
+    # Wrong number of arguments
     log_message "ERROR" "Incorrect number of arguments. Use -h or --help for usage."
     exit 1
 fi
-
-# assign arguments to variables and validate directories
-SRC="$1"
-DST="$2"
 
 # Source directory validation
 if [ ! -d "$SRC" ]; then
